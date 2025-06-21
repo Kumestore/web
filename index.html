@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kumestore - Servicios de Streaming Premium</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .cart-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .cart-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .cart-count {
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        select {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+        }
+
+        select option {
+            background: #4a5568;
+            color: white;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .service-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .service-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .service-price {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .service-type {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .service-details {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .service-details.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 300px; }
+        }
+
+        .add-to-cart {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .add-to-cart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .cart-sidebar {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .cart-sidebar.open {
+            right: 0;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #718096;
+        }
+
+        .cart-item {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .cart-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .quantity-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cart-total {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .checkout-btn:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+        }
+
+        .qr-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .qr-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .qr-code {
+            width: 250px;
+            height: 250px;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .qr-code img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .cart-sidebar {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filters {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>KumeStore</h1>
+            <p class="subtitle">Accede a los mejores servicios de streaming y paga con yape</p>
+        </header>
+
+        <div class="controls">
+            <button class="cart-toggle" onclick="toggleCart()">
+                🛒 Carrito
+                <span class="cart-count" id="cart-count">0</span>
+            </button>
+            
+            <div class="filters">
+                <select id="sort-select" onchange="sortServices()">
+                    <option value="default">Ordenar por...</option>
+                    <option value="price-low">Precio: Menor a Mayor</option>
+                    <option value="price-high">Precio: Mayor a Menor</option>
+                    <option value="name">Nombre A-Z</option>
+                    <option value="popular">Más Populares</option>
+                </select>
+                
+                <select id="filter-select" onchange="filterServices()">
+                    <option value="all">Todos los servicios</option>
+                    <option value="streaming">Solo Streaming</option>
+                    <option value="music">Solo Música</option>
+                    <option value="tools">Herramientas</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="services-grid" id="services-grid">
+            <!-- Los servicios se generarán dinámicamente -->
+        </div>
+    </div>
+
+    <!-- Carrito lateral -->
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h3>Mi Carrito</h3>
+            <button class="close-cart" onclick="toggleCart()">×</button>
+        </div>
+        <div id="cart-items"></div>
+        <div class="cart-total">
+            <h3>Total: S/ <span id="cart-total">0.00</span></h3>
+            <button class="checkout-btn" onclick="showQR()">Pagar con QR</button>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="closeCart()"></div>
+
+    <!-- Modal QR -->
+    <div class="qr-modal" id="qr-modal">
+        <div class="qr-content">
+            <h3>Código QR para Pago<br>
+            el qr te dirigira a un whatsap donde se te proporcionara el yape al que tienes que hacer el pago</h3>
+            <div class="qr-code">
+                <img src="qr.jpg" alt="Código QR para pago" />
+            </div>
+            <p><strong>Total: S/ <span id="qr-total">0.00</span></strong></p>
+            <p style="font-size: 0.9rem; color: #718096; margin-top: 10px;">
+                Escanea el código QR para enviar tu pedido por WhatsApp
+            </p>
+            <button onclick="closeQR()" style="margin-top: 15px; padding: 10px 20px; background: #e53e3e; color: white; border: none; border-radius: 5px; cursor: pointer;">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        // Datos de los servicios
+        const services = [
+            {
+                name: "Amazon Prime Video",
+                type: "Perfil compartido",
+                price: 8.00,
+                category: "streaming",
+                popular: true,
+                description: "Acceso completo a Amazon Prime Video con miles de películas, series originales y contenido exclusivo. Perfil compartido con garantía de funcionamiento."
+            },
+            {
+                name: "HBO Max (Platinum)",
+                type: "Perfil compartido",
+                price: 9.00,
+                category: "streaming",
+                popular: true,
+                description: "Disfruta de HBO Max en calidad Platinum. Incluye todas las series y películas de HBO, Warner Bros y contenido exclusivo de DC."
+            },
+            {
+                name: "Crunchyroll Mega Fan",
+                type: "Perfil compartido",
+                price: 7.00,
+                category: "streaming",
+                popular: false,
+                description: "La mejor plataforma de anime con acceso premium. Sin anuncios, simulcasts y acceso a manga premium."
+            },
+            {
+                name: "Disney+ Premium",
+                type: "Perfil compartido",
+                price: 11.00,
+                category: "streaming",
+                popular: true,
+                description: "Todo el contenido de Disney, Pixar, Marvel, Star Wars y National Geographic en un solo lugar."
+            },
+            {
+                name: "Netflix Premium",
+                type: "Perfil compartido",
+                price: 13.00,
+                category: "streaming",
+                popular: true,
+                description: "Netflix Premium con 4K Ultra HD, HDR y acceso a todo el catálogo global de contenido."
+            },
+            {
+                name: "Paramount+",
+                type: "Perfil compartido",
+                price: 7.50,
+                category: "streaming",
+                popular: false,
+                description: "Streaming de Paramount con películas, series originales y contenido de CBS, MTV, Nickelodeon y Comedy Central."
+            },
+            {
+                name: "YouTube Premium",
+                type: "Cuenta propia (con garantía)",
+                price: 10.00,
+                category: "streaming",
+                popular: true,
+                description: "YouTube sin anuncios, reproducción en segundo plano, descargas offline y acceso a YouTube Music incluido."
+            },
+            {
+                name: "Apple Music",
+                type: "Cuenta propia",
+                price: 11.00,
+                category: "music",
+                popular: false,
+                description: "Más de 100 millones de canciones sin anuncios, audio espacial y lossless de alta calidad."
+            },
+            {
+                name: "Spotify Premium",
+                type: "Cuenta propia renovable",
+                price: 11.00,
+                category: "music",
+                popular: true,
+                description: "Música sin límites, sin anuncios, descargas offline y calidad de audio superior."
+            },
+            {
+                name: "ChatGPT Plus",
+                type: "Cuenta propia",
+                price: 34.00,
+                category: "tools",
+                popular: true,
+                description: "Acceso prioritario a ChatGPT-4, respuestas más rápidas y nuevas funciones antes que nadie."
+            },
+            {
+                name: "Claro + Liga 1 Max",
+                type: "Perfil compartido",
+                price: 18.00,
+                category: "streaming",
+                popular: false,
+                description: "Disfruta de todo el fútbol peruano en vivo más contenido premium de entretenimiento."
+            },
+            {
+                name: "Movistar TV",
+                type: "Perfil compartido",
+                price: 18.00,
+                category: "streaming",
+                popular: false,
+                description: "Acceso completo a la plataforma de streaming de Movistar con películas, series y deportes."
+            },
+            {
+                name: "Canva Premium",
+                type: "Cuenta propia (correo personal)",
+                price: 9.50,
+                category: "tools",
+                popular: false,
+                description: "Herramienta de diseño profesional con templates premium, elementos exclusivos y funciones avanzadas."
+            },
+            {
+                name: "IPTV (Full canales)",
+                type: "Cuenta propia",
+                price: 12.00,
+                category: "streaming",
+                popular: false,
+                description: "Acceso completo a canales de televisión internacional en vivo, deportes, películas y series."
+            }
+        ];
+
+        let cart = [];
+        let currentServices = [...services];
+
+        // Inicializar la página
+        function init() {
+            renderServices();
+            updateCartCount();
+        }
+
+        // Renderizar servicios
+        function renderServices() {
+            const grid = document.getElementById('services-grid');
+            grid.innerHTML = '';
+
+            currentServices.forEach((service, index) => {
+                const serviceCard = document.createElement('div');
+                serviceCard.className = 'service-card';
+                serviceCard.onclick = () => toggleServiceDetails(index);
+
+                serviceCard.innerHTML = `
+                    <div class="service-header">
+                        <div class="service-name">${service.name}</div>
+                        <div class="service-price">S/ ${service.price.toFixed(2)}</div>
+                    </div>
+                    <div class="service-type">${service.type}</div>
+                    <div class="service-details" id="details-${index}">
+                        <p>${service.description}</p>
+                        <button class="add-to-cart" onclick="addToCart(${index}); event.stopPropagation();">
+                            ➕ Agregar al carrito
+                        </button>
+                    </div>
+                `;
+
+                grid.appendChild(serviceCard);
+            });
+        }
+
+        // Mostrar/ocultar detalles del servicio
+        function toggleServiceDetails(index) {
+            const details = document.getElementById(`details-${index}`);
+            details.classList.toggle('show');
+        }
+
+        // Agregar al carrito
+        function addToCart(index) {
+            const service = currentServices[index];
+            const existingItem = cart.find(item => item.name === service.name);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    ...service,
+                    quantity: 1
+                });
+            }
+
+            updateCartCount();
+            updateCartDisplay();
+        }
+
+        // Actualizar contador del carrito
+        function updateCartCount() {
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cart-count').textContent = count;
+            document.getElementById('cart-count').style.display = count > 0 ? 'flex' : 'none';
+        }
+
+        // Actualizar display del carrito
+        function updateCartDisplay() {
+            const cartItems = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p style="text-align: center; color: #718096;">Tu carrito está vacío</p>';
+                cartTotal.textContent = '0.00';
+                return;
+            }
+
+            cartItems.innerHTML = '';
+            let total = 0;
+
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                total += itemTotal;
+
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <div class="cart-item-header">
+                        <strong>${item.name}</strong>
+                        <button onclick="removeFromCart(${index})" style="background: #e53e3e; color: white; border: none; border-radius: 50%; width: 25px; height: 25px; cursor: pointer;">×</button>
+                    </div>
+                    <div style="font-size: 0.9rem; color: #718096;">${item.type}</div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" onclick="changeQuantity(${index}, -1)">-</button>
+                        <span>${item.quantity} ${item.quantity > 1 ? 'meses' : 'mes'}</span>
+                        <button class="quantity-btn" onclick="changeQuantity(${index}, 1)">+</button>
+                        <span style="margin-left: auto; font-weight: bold;">S/ ${itemTotal.toFixed(2)}</span>
+                    </div>
+                `;
+                cartItems.appendChild(cartItem);
+            });
+
+            cartTotal.textContent = total.toFixed(2);
+        }
+
+        // Cambiar cantidad
+        function changeQuantity(index, change) {
+            cart[index].quantity += change;
+            if (cart[index].quantity <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCartCount();
+            updateCartDisplay();
+        }
+
+        // Remover del carrito
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartCount();
+            updateCartDisplay();
+        }
+
+        // Toggle carrito
+        function toggleCart() {
+            const sidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('show');
+            } else {
+                sidebar.classList.add('open');
+                overlay.classList.add('show');
+                updateCartDisplay();
+            }
+        }
+
+        // Cerrar carrito
+        function closeCart() {
+            document.getElementById('cart-sidebar').classList.remove('open');
+            document.getElementById('overlay').classList.remove('show');
+        }
+
+        // Mostrar QR
+        function showQR() {
+            if (cart.length === 0) {
+                alert('Tu carrito está vacío');
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('qr-total').textContent = total.toFixed(2);
+
+            // Generar mensaje para WhatsApp
+            let message = "Hola, quisiera adquirir ";
+            
+            // Agregar servicios seleccionados
+            const servicesList = cart.map(item => {
+                return `${item.name} por ${item.quantity} ${item.quantity > 1 ? 'meses' : 'mes'}`;
+            }).join(', ');
+            
+            message += servicesList;
+            message += ` - S/ ${total.toFixed(2)}`;
+
+            // Codificar el mensaje para URL
+            const encodedMessage = encodeURIComponent(message);
+            
+            // Tu número de WhatsApp (reemplaza con tu número real)
+            const phoneNumber = "51978602356"; // Cambia este número por tu número real
+            
+            // Generar URL de WhatsApp
+            const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+            
+            // Generar QR code usando una API gratuita
+            const qrCodeURL = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(whatsappURL)}`;
+            
+            // Actualizar la imagen del QR
+            const qrImage = document.querySelector('.qr-code img');
+            qrImage.src = qrCodeURL;
+            
+            document.getElementById('qr-modal').style.display = 'block';
+        }
+
+        // Cerrar QR
+        function closeQR() {
+            document.getElementById('qr-modal').style.display = 'none';
+        }
+
+        // Ordenar servicios
+        function sortServices() {
+            const sortValue = document.getElementById('sort-select').value;
+
+            switch (sortValue) {
+                case 'price-low':
+                    currentServices.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-high':
+                    currentServices.sort((a, b) => b.price - a.price);
+                    break;
+                case 'name':
+                    currentServices.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                case 'popular':
+                    currentServices.sort((a, b) => b.popular - a.popular);
+                    break;
+                default:
+                    currentServices = [...services];
+            }
+
+            renderServices();
+        }
+
+        // Filtrar servicios
+        function filterServices() {
+            const filterValue = document.getElementById('filter-select').value;
+
+            if (filterValue === 'all') {
+                currentServices = [...services];
+            } else {
+                currentServices = services.filter(service => service.category === filterValue);
+            }
+
+            renderServices();
+        }
+
+        // Inicializar cuando la página cargue
+        window.onload = init;
+    </script>
+</body>
+</html>
